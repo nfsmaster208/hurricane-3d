@@ -1,0 +1,119 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Hurricane Explorer — 3D (beta)</title>
+<style>
+  body{margin:0;background:#050913;color:#e9f2ff;font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif}
+  #ui{position:fixed;top:10px;left:10px;display:flex;gap:8px;z-index:5}
+  #ui a, #ui button{background:#173157;color:#fff;border:1px solid #2f4b78;border-radius:10px;padding:8px 12px;text-decoration:none}
+  #log{position:fixed;left:10px;bottom:10px;width:320px;height:120px;background:#0b1831;color:#cfe4ff;border:1px solid #2b3d63;border-radius:8px;padding:8px;overflow:auto;white-space:pre-wrap;z-index:5}
+  canvas{display:block}
+</style>
+<script src="https://unpkg.com/three@0.159.0/build/three.min.js"></script>
+<script src="https://unpkg.com/three@0.159.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+<div id="ui">
+  <a href="./" target="_self">Back to 2D</a>
+  <button id="reload">Reload</button>
+</div>
+<div id="log"></div>
+<script>
+(function(){
+  const logEl = document.getElementById('log'); function log(...a){ logEl.textContent += a.join(' ')+'\n'; logEl.scrollTop=logEl.scrollHeight; console.log(...a); }
+  const qs = new URLSearchParams(location.search);
+  const coneP = qs.get('cone'); const trackP = qs.get('track'); const windP = qs.get('wind');
+  const useMirror = qs.has('mirror'); const useDemo = qs.has('demo');
+
+  async function loadData(){
+    try{
+      if(useMirror){
+        const [cone,track,wind] = await Promise.all([fetch('live/cone.geojson').then(r=>r.json()), fetch('live/track.geojson').then(r=>r.json()), fetch('live/wind.geojson').then(r=>r.json())]);
+        return {cone,track,wind};
+      }else if(coneP || trackP || windP){
+        const [cone,track,wind] = await Promise.all([
+          coneP? fetch(coneP).then(r=>r.json()) : {type:'FeatureCollection',features:[]},
+          trackP? fetch(trackP).then(r=>r.json()) : {type:'FeatureCollection',features:[]},
+          windP? fetch(windP).then(r=>r.json()) : {type:'FeatureCollection',features:[]},
+        ]);
+        return {cone,track,wind};
+      }else{
+        const demo = await fetch('demo_offline.json').then(r=>r.json());
+        return {cone:demo.layers.cone, track:demo.layers.track, wind:demo.layers.wind};
+      }
+    }catch(e){ log('Load failed', e); return {cone:{type:'FeatureCollection',features:[]}, track:{type:'FeatureCollection',features:[]}, wind:{type:'FeatureCollection',features:[]}}; }
+  }
+
+  const R = 1;
+  function ll2xyz(lon,lat){ const lo = lon*Math.PI/180, la = lat*Math.PI/180; const x = R*Math.cos(la)*Math.cos(lo); const y = R*Math.sin(la); const z = R*Math.cos(la)*Math.sin(lo); return new THREE.Vector3(x,y,z); }
+
+  let renderer, scene, camera, controls;
+  function init(){
+    renderer = new THREE.WebGLRenderer({antialias:true}); renderer.setSize(window.innerWidth, window.innerHeight); document.body.appendChild(renderer.domElement);
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.01, 1000); camera.position.set(0,0,3);
+    controls = new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping = true;
+    const light = new THREE.DirectionalLight(0xffffff, 1.0); light.position.set(5,3,5); scene.add(light); scene.add(new THREE.AmbientLight(0x6688aa, 0.6));
+
+    const sphere = new THREE.Mesh(new THREE.SphereGeometry(R, 64, 64), new THREE.MeshPhongMaterial({color:0x0d2346, emissive:0x0b1630, shininess:5, wireframe:false}));
+    scene.add(sphere);
+
+    window.addEventListener('resize', ()=>{ camera.aspect=window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+  }
+
+  function addTrack(track){
+    (track.features||[]).forEach(f=>{
+      if(f.geometry?.type!=='LineString') return;
+      const coords = f.geometry.coordinates;
+      const g = new THREE.BufferGeometry();
+      const verts = [];
+      coords.forEach(c=>{ const v=ll2xyz(c[0], c[1]); verts.push(v.x, v.y, v.z); });
+      g.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(verts), 3));
+      const line = new THREE.Line(g, new THREE.LineBasicMaterial({color:0xffffff, linewidth:2}));
+      scene.add(line);
+    });
+  }
+  function addWind(wind, code, color){
+    (wind.features||[]).filter(f=> f.properties?.windcode===code).slice(0,200).forEach(f=>{
+      const ring = (f.geometry?.coordinates?.[0]) || [];
+      const g = new THREE.BufferGeometry();
+      const verts = [];
+      ring.forEach(c=>{ const v=ll2xyz(c[0], c[1]); verts.push(v.x, v.y, v.z); });
+      g.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(verts), 3));
+      const line = new THREE.LineLoop(g, new THREE.LineBasicMaterial({color, transparent:true, opacity:0.35}));
+      scene.add(line);
+    });
+  }
+  function addCone(cone){
+    (cone.features||[]).forEach(f=>{
+      const ring = (f.geometry?.coordinates?.[0]) || [];
+      const g = new THREE.BufferGeometry();
+      const verts = [];
+      ring.forEach(c=>{ const v=ll2xyz(c[0], c[1]); verts.push(v.x, v.y, v.z); });
+      g.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(verts), 3));
+      const line = new THREE.LineLoop(g, new THREE.LineBasicMaterial({color:0x87b3ff, transparent:true, opacity:0.35}));
+      scene.add(line);
+    });
+  }
+
+  async function start(){
+    init();
+    const {cone, track, wind} = await loadData();
+    addCone(cone);
+    addTrack(track);
+    addWind(wind, 34, 0xffd24d);
+    addWind(wind, 50, 0xff9f43);
+    addWind(wind, 64, 0xff4d4d);
+    animate();
+  }
+  function animate(){ requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }
+
+  document.getElementById('reload').onclick = ()=>{ location.reload(); };
+  start();
+})();
+</script>
+</body>
+</html>

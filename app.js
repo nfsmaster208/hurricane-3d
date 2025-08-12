@@ -1,21 +1,47 @@
-// v6 beta: Leaflet + canvas fallback, demo + Live Data loader (manual + NHC list if available).
+// v6.1 — One-tap storm picker + Mirror mode + Open 3D launcher
 const logEl = document.getElementById('log');
 function log(...a){ const t=a.map(x=> typeof x==='object'? JSON.stringify(x): String(x)).join(' '); logEl.textContent += t+'\n'; logEl.scrollTop=logEl.scrollHeight; console.log(...a); }
 
 const mapHost = document.getElementById('map');
-const state = { useLeaflet:false, map:null, layers:{}, view:null, canvas:null, ctx:null, data:null, idx:0, fitted:false };
+const state = { useLeaflet:false, map:null, layers:{}, view:null, canvas:null, ctx:null, data:null, idx:0, fitted:false, source:'demo' };
 
-// Init buttons
+// NOAA ArcGIS summary service
+const ROOT = 'https://mapservices.weather.noaa.gov/tropical/rest/services/tropical/NHC_tropical_weather_summary/MapServer';
+const LAYER_TRACK = 6;
+const LAYER_CONE  = 7;
+const LAYER_WIND  = 15;
+
+// UI wires
 document.getElementById('togglePanel').onclick = ()=>{
   const p = document.getElementById('panel'); const hidden = p.style.display==='none';
   p.style.display = hidden ? 'block':'none'; setTimeout(resize, 150);
 };
-document.getElementById('reloadDemo').onclick = ()=>{ loadDemo(); };
+document.getElementById('reloadDemo').onclick = ()=> loadDemo();
 document.getElementById('showFlorida').onclick = ()=>{ fitFlorida(); draw(); };
 
 document.getElementById('loadNHC').onclick = loadNHCList;
 document.getElementById('loadSelected').onclick = ()=> loadFromSelect();
 document.getElementById('loadManual').onclick = ()=> loadManual();
+document.getElementById('loadMirror').onclick = ()=> loadMirror();
+
+document.getElementById('open3d').onclick = (e)=>{
+  e.preventDefault();
+  const cone = document.getElementById('coneUrl').value.trim();
+  const track = document.getElementById('trackUrl').value.trim();
+  const wind = document.getElementById('windUrl').value.trim();
+  let url = '3d.html?';
+  if(state.source==='mirror'){ url += 'mirror=1'; }
+  else if(cone || track || wind){
+    const p = new URLSearchParams();
+    if(cone)  p.set('cone',  cone);
+    if(track) p.set('track', track);
+    if(wind)  p.set('wind',  wind);
+    url += p.toString();
+  }else{
+    url += 'demo=1';
+  }
+  window.open(url,'_blank');
+};
 
 const timeSlider = document.getElementById('time');
 const tlabel = document.getElementById('tlabel');
@@ -25,7 +51,7 @@ timeSlider.oninput = ()=>{ state.idx = +timeSlider.value; updateT(); draw(); bui
 if(window.L){ startLeaflet(); } else { startCanvas(); }
 loadDemo();
 
-// ---------- Core rendering ----------
+// ---------- Map rendering ----------
 function startLeaflet(){
   state.useLeaflet = true;
   state.map = L.map('map',{preferCanvas:true, zoomControl:true});
@@ -54,17 +80,11 @@ function startCanvas(){
   state.canvas=c; state.ctx=c.getContext('2d'); fitFlorida(); log('Canvas path');
   window.addEventListener('resize', resize);
 }
-
 function resize(){ if(state.canvas){ const w=mapHost.clientWidth, h=mapHost.clientHeight; state.canvas.width=w; state.canvas.height=h; draw(); } if(state.map) state.map.invalidateSize(); }
 function fitFlorida(){ if(state.useLeaflet) state.map.fitBounds([[24.3,-87.7],[31.2,-79.8]]); else state.view={cx:-83.5,cy:27.5,scale:5.2}; }
 
 function updateT(){ const t = state.data.timeline[state.idx]; tlabel.textContent = new Date(t).toUTCString().replace(':00 GMT','Z'); }
-
-function draw(){
-  if(!state || !state.data) return;
-  if(state.useLeaflet) drawLeaflet(); else drawCanvas();
-}
-
+function draw(){ if(!state || !state.data) return; state.useLeaflet ? drawLeaflet() : drawCanvas(); }
 function clearLeaflet(){ Object.values(state.layers).forEach(g=> g&&g.clearLayers()); }
 function drawLeaflet(){
   clearLeaflet();
@@ -82,12 +102,10 @@ function drawLeaflet(){
   if(document.getElementById('wind34Chk').checked) drawW(34,state.layers.w34,'#ffd24d');
   if(document.getElementById('wind50Chk').checked) drawW(50,state.layers.w50,'#ff9f43');
   if(document.getElementById('wind64Chk').checked) drawW(64,state.layers.w64,'#ff4d4d');
-
   if(!state.fitted){ fitFlorida(); state.fitted=true; }
 }
-
 function project(lon,lat){ const w=state.canvas.width, h=state.canvas.height; const s=state.view.scale, cx=state.view.cx, cy=state.view.cy; return [(lon-cx)*s+w/2,(cy-lat)*s+h/2]; }
-function drawPoly(ctx, coords, opts){ ctx.beginPath(); coords.forEach((c,i)=>{ const p=project(c[0],c[1]); if(i===0) ctx.moveTo(p[0],p[1]); else ctx.lineTo(p[0],p[1]); }); ctx.closePath(); if(opts.fill){ ctx.fillStyle=opts.fill; ctx.globalAlpha=opts.alpha||1; ctx.fill(); ctx.globalAlpha=1; } if(opts.stroke){ ctx.strokeStyle=opts.stroke; ctx.lineWidth=opts.width||1; ctx.stroke(); } }
+function drawPoly(ctx, coords, opts){ ctx.beginPath(); coords.forEach((c,i)=>{ const p=project(c[0], c[1]); if(i===0) ctx.moveTo(p[0],p[1]); else ctx.lineTo(p[0],p[1]); }); ctx.closePath(); if(opts.fill){ ctx.fillStyle=opts.fill; ctx.globalAlpha=opts.alpha||1; ctx.fill(); ctx.globalAlpha=1; } if(opts.stroke){ ctx.strokeStyle=opts.stroke; ctx.lineWidth=opts.width||1; ctx.stroke(); } }
 function drawCanvas(){
   const ctx=state.ctx; const w=state.canvas.width, h=state.canvas.height;
   const grad=ctx.createRadialGradient(w*0.4,h*0.5,0,w*0.4,h*0.5,Math.max(w,h)); grad.addColorStop(0,'#0b162c'); grad.addColorStop(1,'#091222'); ctx.fillStyle=grad; ctx.fillRect(0,0,w,h);
@@ -104,11 +122,14 @@ function drawCanvas(){
 async function loadDemo(){
   try{
     const j = await fetch('demo_offline.json', {cache:'no-store'}).then(r=>r.json());
-    state.data = j; state.idx=0; state.fitted=false; timeSlider.max=j.timeline.length-1; timeSlider.value=0; updateT(); draw(); buildImpacts(); log('Demo loaded');
+    setData(j); state.source='demo'; log('Demo loaded');
   }catch(e){ log('Demo load failed', e); }
 }
-
-// Manual URLs
+function setData(j){
+  state.data = j; state.idx=0; state.fitted=false;
+  const n = (j.timeline||[]).length; timeSlider.max = Math.max(0,n-1); timeSlider.value=0;
+  updateT(); draw(); buildImpacts();
+}
 async function loadManual(){
   const coneUrl = document.getElementById('coneUrl').value.trim();
   const trackUrl = document.getElementById('trackUrl').value.trim();
@@ -121,59 +142,65 @@ async function loadManual(){
       windUrl? fetch(windUrl).then(r=>r.json()) : {type:'FeatureCollection',features:[]},
     ]);
     const timeline = inferTimeline(wind);
-    state.data = { timeline, layers: { cone, track, wind } };
-    state.idx = 0; timeSlider.max=timeline.length-1; timeSlider.value=0; state.fitted=false; updateT(); draw(); buildImpacts();
-    log('Manual live data loaded');
+    setData({ timeline, layers:{ cone, track, wind } });
+    state.source='manual';
+    log('Live data loaded (manual)');
   }catch(e){ log('Manual load failed', e); }
 }
-
-// Auto from NHC list
-async function loadNHCList(){
+async function loadMirror(){
   try{
-    const url = 'https://www.nhc.noaa.gov/CurrentStorms.json';
-    const list = await fetch(url, {cache:'no-store'}).then(r=>r.json());
-    // Very light parsing: we just show storm names + IDs if present; manual URLs still recommended for specifics.
-    const sel = document.getElementById('stormSelect'); sel.innerHTML = '<option value="">— choose —</option>';
-    const storms = (list?.activeStorms) || (list?.storms) || [];
-    storms.forEach((s,i)=>{
-      const id = s?.id || s?.stormId || `storm${i}`;
-      const name = s?.name || s?.stormName || s?.storm?.name || 'Storm';
-      const basin = s?.basin || s?.stormBasin || '';
-      const adv = s?.advisory || s?.publicAdvisory || '';
-      const opt = document.createElement('option'); opt.value = JSON.stringify(s); opt.textContent = `${name} ${id} ${basin} ${adv}`;
-      sel.appendChild(opt);
-    });
-    log('Loaded NHC list, items:', storms.length);
-  }catch(e){ log('NHC list failed (CORS or schema). Paste manual URLs as fallback.', e); }
+    const [cone, track, wind] = await Promise.all([
+      fetch('live/cone.geojson', {cache:'no-store'}).then(r=>r.json()),
+      fetch('live/track.geojson',{cache:'no-store'}).then(r=>r.json()),
+      fetch('live/wind.geojson', {cache:'no-store'}).then(r=>r.json())
+    ]);
+    const timeline = inferTimeline(wind);
+    setData({ timeline, layers:{ cone, track, wind } });
+    state.source='mirror';
+    log('Loaded mirror /live/*.geojson');
+  }catch(e){ log('Mirror load failed. Ensure workflow created /live files.', e); }
 }
 
+// ---------- NHC picker ----------
+async function loadNHCList(){
+  const sel = document.getElementById('stormSelect'); sel.innerHTML = '<option value="">— none —</option>';
+  try{
+    const q = `${ROOT}/${LAYER_TRACK}/query?where=1%3D1&outFields=stormid,stormname,basin&returnDistinctValues=true&returnGeometry=false&f=pjson`;
+    const j = await fetch(q, {cache:'no-store'}).then(r=>r.json());
+    const feats = (j && j.features) ? j.features : [];
+    const rows = feats.map(f=> f.attributes || {}).filter(a=> a.stormid || a.stormname);
+    const seen = new Set(); const items=[];
+    rows.forEach(a=>{ const key = `${a.stormid||''}|${a.stormname||''}`; if(seen.has(key)) return; seen.add(key); items.push({id:a.stormid||'',name:a.stormname||'',basin:a.basin||''}); });
+    items.sort((a,b)=> (a.basin+a.name).localeCompare(b.basin+b.name));
+    items.forEach(obj=>{ const opt=document.createElement('option'); opt.value = JSON.stringify(obj); opt.textContent=`${obj.name||'(unnamed)'} ${obj.id? '· '+obj.id:''} ${obj.basin? '· '+obj.basin:''}`.trim(); sel.appendChild(opt); });
+    log('NHC list loaded:', items.length);
+  }catch(e){ log('NHC list failed (CORS or schema). Use manual URLs.', e); }
+}
 async function loadFromSelect(){
   const sel = document.getElementById('stormSelect');
   if(!sel.value){ log('No storm selected.'); return; }
-  try{
-    const obj = JSON.parse(sel.value);
-    // We can’t rely on exact schema; provide fields for manual override instead.
-    log('Selected storm:', obj?.name || obj?.stormName || obj?.id);
-    // If the object contains direct GeoJSON URLs (some feeds do), try to fetch them; else ask user to paste URLs.
-    const coneUrl = obj?.cone?.geojson || obj?.cone?.url || '';
-    const trackUrl = obj?.track?.geojson || obj?.track?.url || '';
-    const windUrl = obj?.wind?.geojson || obj?.wind?.url || '';
-    if(coneUrl || trackUrl || windUrl){
-      document.getElementById('coneUrl').value = coneUrl;
-      document.getElementById('trackUrl').value = trackUrl;
-      document.getElementById('windUrl').value = windUrl;
-      await loadManual();
-    }else{
-      log('Storm entry lacks direct GeoJSON links. Paste known URLs and click "Load manual URLs".');
-    }
-  }catch(e){ log('Failed to parse selected storm entry', e); }
+  let obj; try{ obj = JSON.parse(sel.value); }catch{ log('Bad selection value.'); return; }
+  const id = (obj.id || '').trim(); const name = (obj.name || '').trim();
+  if(!id && !name){ log('Selected storm lacks id/name'); return; }
+  const coneUrl  = `${ROOT}/${LAYER_CONE }/query?where=stormname%3D%27${encodeURIComponent(name)}%27&outFields=stormname,basin,advisnum,advdate,fcstprd,stormnum,stormid&returnGeometry=true&f=geojson`;
+  const trackUrl = `${ROOT}/${LAYER_TRACK}/query?where=stormname%3D%27${encodeURIComponent(name)}%27&outFields=stormname,basin,advisnum,advdate,fcstprd,stormnum,stormid&returnGeometry=true&f=geojson`;
+  const windUrl  = `${ROOT}/${LAYER_WIND }/query?where=stormid%20LIKE%20%27${encodeURIComponent(id)}%25%27&outFields=stormid,basin,stormnum,advnum,validtime,radii,ne,se,sw,nw&returnGeometry=true&f=geojson`;
+  document.getElementById('coneUrl').value  = coneUrl;
+  document.getElementById('trackUrl').value = trackUrl;
+  document.getElementById('windUrl').value  = windUrl;
+  await loadManual();
 }
 
-// Infer timeline from wind features (by validtime), or fall back to 1-step
+// ---------- Helpers ----------
 function inferTimeline(windFC){
-  const tset = new Set();
-  (windFC?.features || []).forEach(f=>{ const t=f?.properties?.validtime; if(t) tset.add(t); });
-  const arr = Array.from(tset).sort();
+  const set = new Set();
+  (windFC?.features || []).forEach(f=>{
+    let t = f?.properties?.validtime;
+    if(t==null) return;
+    if(typeof t==='number'){ if(t < 1e11) t *= 1000; set.add(new Date(t).toISOString()); }
+    else if(typeof t==='string'){ const d = new Date(t); if(!isNaN(d)) set.add(d.toISOString()); }
+  });
+  const arr = Array.from(set).sort();
   return arr.length ? arr : [new Date().toISOString()];
 }
 

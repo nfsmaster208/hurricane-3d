@@ -1,19 +1,21 @@
+
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Hurricane Explorer — v6 (beta)</title>
+<title>Hurricane Explorer — v6.1</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 <header>
-  <div class="brand">🌀 Hurricane Explorer (v6 beta)</div>
+  <div class="brand">🌀 Hurricane Explorer (v6.1)</div>
   <div class="actions">
     <button id="showFlorida">Show Florida</button>
     <button id="reloadDemo">Reload demo</button>
+    <a id="open3d" href="3d.html" target="_blank">Open 3D (beta)</a>
     <button id="togglePanel">Hide panel</button>
   </div>
 </header>
@@ -33,7 +35,10 @@
         <label>Wind GeoJSON</label><input id="windUrl" placeholder="https://…wind34_50_64.geojson"/>
         <button id="loadManual">Load manual URLs</button>
       </div>
-      <div class="small">Tip: If an auto endpoint fails, paste a known GeoJSON URL here. This always falls back to the demo.</div>
+      <div class="grid">
+        <button id="loadMirror">Load mirror (/live)</button>
+        <div class="small">If you add the Actions workflow, this button loads <code>/live/*.geojson</code> from your repo (same-origin, no CORS).</div>
+      </div>
     </details>
 
     <details open>
@@ -64,7 +69,7 @@
     </details>
   </aside>
 </main>
-<footer>Leaflet tiles with canvas fallback. Demo data included. Live mode uses public NHC/NOAA endpoints when available.</footer>
+<footer>Leaflet tiles with canvas fallback. Demo data included. Live mode uses NOAA ArcGIS when available.</footer>
 <script src="app.js"></script>
 </body>
 </html>
