@@ -1,227 +1,52 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Material+Symbols+Rounded:FILL,GRAD,opsz,wght@0,0,48,400;1,0,48,400" rel="stylesheet">
-
   <meta charset="utf-8" />
-  <title>3D Hurricane Explorer — Cone, Winds & Florida Impacts</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="stylesheet" href="style.css" />
-  <!-- MapLibre (3D tilted map) -->
-  <link href="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.css" rel="stylesheet"/>
-  <script src="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.js"></script>
-  <!-- Three.js + Three-Globe for the 3D globe -->
-  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
-  <script src="https://unpkg.com/three-globe@2.30.0/dist/three-globe.min.js"></script>
-  <!-- Turf for geodesic math -->
-  <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <title>Hurricane Explorer — Mobile Fallback (v5)</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 <header>
-  <div class="brand">🌀 3D Hurricane Explorer</div>
-  <div class="search"><input id="searchBox" placeholder="Search address or place" /><button id="searchGo">Go</button></div>
+  <div class="brand">🌀 Hurricane Explorer (v5)</div>
   <div class="controls">
-    <div class="searchWrap glass">
-      <span class="material-symbols-rounded">search</span>
-      <input id="addrInput" placeholder="Search address or place…" />
-      <button id="addrGo" class="md-btn">Go</button>
-      <div id="addrResults" class="results"></div>
-    </div>
-    <select id="stormSelect"><option>Loading storms…</option></select>
-    <button id="reload">Reload Live</button>
-    <label class="toggle"><input type="checkbox" id="viewToggle" /> <span>Globe / Map</span></label>
-    <input id="timeSlider" type="range" min="0" max="0" step="1" value="0" />
-    <span id="timeLabel">—</span>
-    <button id="shareBtn">Share</button>
-    <button id="recordBtn">Record</button>
-    <label class="toggle"><input type="checkbox" id="offlineChk" checked /> <span>Offline (demo)</span></label>
-    <button id="diagBtn">Run diagnostics</button>
+    <button id="liveToggle">Live OFF</button>
+    <button id="centerFlorida">Florida</button>
   </div>
 </header>
-
 <main>
-  <section id="stage">
-    <div id="globeContainer" class="stagePane"></div>
-    <div id="mapContainer" class="stagePane hidden"></div>
-  </section>
-  <aside id="sidebar">
+  <div id="map"></div>
+  <aside id="panel">
     <details open>
       <summary>Layers</summary>
-      <label><input type="checkbox" id="coneChk" checked /> Forecast cone</label>
-      <label><input type="checkbox" id="trackChk" checked /> Forecast track</label>
-      <label><input type="checkbox" id="wind34Chk" checked /> 34 kt wind area</label>
-      <label><input type="checkbox" id="wind50Chk" /> 50 kt wind area</label>
-      <label><input type="checkbox" id="wind64Chk" /> 64 kt wind area</label>
-      <label><input type="checkbox" id="arrivalMLChk" checked /> Arrival time (Most Likely)</label>
-      <label><input type="checkbox" id="arrivalERChk" /> Arrival time (Earliest Reasonable)</label>
-      <label><input type="checkbox" id="warningsChk" checked /> Watches & Warnings</label>
-<label><input type="checkbox" id="urgencyChk" checked /> Urgency (3D)</label>
-<label><input type="checkbox" id="countyPolyChk" checked /> County polygons (extrude)</label>
-<label><input type="checkbox" id="surgeChk" checked /> Surge overlay</label>
-    </details>
-
-    <details open>
-      <summary>Command Center</summary>
-      <div class="cmd">
-        <div class="row">
-          <div><strong>Center</strong> <span id="centerLabel" class="small">Not set</span></div>
-          <div>
-            <button id="useHomeCenter" class="md-btn">Use Home</button>
-            <button id="setCenterFromMap" class="md-btn icon"><span class="material-symbols-rounded">my_location</span></button>
-            <button id="saveCenter" class="md-btn">Save default</button>
-          </div>
-        </div>
-        <div class="row">
-          <label>Radius <input id="centerRadius" type="range" min="10" max="150" step="5" value="50"><span id="radiusVal" class="small">50 mi</span></label>
-        </div>
-        <div id="centerSummary" class="glass card small">Set a center to see ETA, duration, and risk in your area.</div>
-      </div>
+      <label><input type="checkbox" id="coneChk" checked/> Forecast cone</label>
+      <label><input type="checkbox" id="trackChk" checked/> Forecast track</label>
+      <label><input type="checkbox" id="wind34Chk" checked/> 34 kt wind area</label>
+      <label><input type="checkbox" id="wind50Chk"/> 50 kt wind area</label>
+      <label><input type="checkbox" id="wind64Chk"/> 64 kt wind area</label>
     </details>
 
     <details open>
       <summary>Florida Impacts</summary>
-      <div id="floridaImpacts">Loading…</div>
+      <div id="impacts"></div>
       <div class="legend">
-        <div><span class="pill danger"></span> &lt; 24h: Act now</div>
-        <div><span class="pill warn"></span> 24–48h: Prepare</div>
-        <div><span class="pill watch"></span> 48–72h: Monitor</div>
-        <div><span class="pill calm"></span> &gt; 72h / Low</div>
+        <div><span class="pill danger"></span> &lt;24h Act now</div>
+        <div><span class="pill warn"></span> 24–48h Prepare</div>
+        <div><span class="pill watch"></span> 48–72h Monitor</div>
+        <div><span class="pill calm"></span> &gt;72h Low</div>
       </div>
-      <div class="note">Arrival time categories use NHC “most likely arrival” methodology; durations are approximate, inferred from forecast wind radii evolution. Always follow local officials. Sources: NHC/NOAA nowCOAST and CurrentStorms.json.</div>
-    </details>
-
+      <div class="note">Offline demo data. For decisions, use official NHC/NWS sources.</div>
     </details>
 
     <details open>
-      <summary>Urgency Weights</summary>
-<div class="small">Tune how the urgency score is computed (0–10). Changes apply instantly.</div>
-<div id="weightsForm" class="closest">
-  <label>Warnings weight <input id="wWarnings" type="range" min="0" max="5" step="0.5" value="1.0"></label>
-  <label>Surge bonus <input id="wSurge" type="range" min="0" max="5" step="0.5" value="1.5"></label>
-  <label>Arrival time weight <input id="wArrival" type="range" min="0" max="3" step="0.5" value="1.0"></label>
-  <label>Duration weight <input id="wDuration" type="range" min="0" max="3" step="0.5" value="1.0"></label>
-  <label>Intensity weight (50/64 kt) <input id="wIntensity" type="range" min="0" max="3" step="0.5" value="1.0"></label>
-  <label>Coastal exposure bonus <input id="wCoastal" type="range" min="0" max="3" step="0.5" value="1.0"></label>
-  <div class="small">Defaults match v4. Increase Surge/Warnings to emphasize evacuation-prone areas.</div>
-</div>
-</details>
-
-<details open>
-      <summary>My Places</summary>
-<div class="closest">
-  <input id="placeName" placeholder="Home / Work / Family" />
-  <input id="placeLat" placeholder="Lat (e.g., 28.54)" />
-  <input id="placeLon" placeholder="Lon (e.g., -81.38)" />
-  <button id="addPlaceBtn">Add place</button>
-</div>
-<div id="myPlacesList" class="small" style="margin-top:6px"></div>
-</details>
-
-<details open>
-      <summary>My Groups</summary>
-<div id="groupsPanel" class="card glass small">Groups summarize the highest risk & earliest arrival across members.</div>
-</details>
-
-<details open>
-      <summary>County Risk (3D)</summary>
-      <div class="small" style="margin:6px 0 12px">Toggle the 3D urgency columns on the globe. On the map, counties can be extruded by risk.</div>
-    </details>
-
-    <details open>
-      <summary>County Briefings (PDF)</summary>
-      <div class="closest">
-        <select id="countyPdfSelect"></select>
-        <button id="countyPdfBtn">Generate PDF</button>
-      </div>
-    
-      <div id="countyRiskLegend" class="legend">
-        <div><span class="pill danger"></span> Evacuate if ordered</div>
-        <div><span class="pill warn"></span> Consider leaving (vulnerable/coastal)</div>
-        <div><span class="pill watch"></span> Shelter & prepare</div>
-        <div><span class="pill calm"></span> Monitor</div>
-      </div>
-      <div class="note">Urgency score combines watches/warnings (incl. storm surge), arrival window, wind duration & intensity, and coastal exposure. Always defer to local officials.</div>
-    </details>
-
-    <details>
-      <summary>Closest Approach</summary>
-      <div class="closest">
-        <select id="citySelect"></select>
-        <div id="closestReadout">—</div>
-      </div>
-    </details>
-
-    <details>
-      <summary>Paste Advisory JSON (optional)</summary>
-      <textarea id="jsonBox" placeholder='Paste NHC CurrentStorms.json or a cone GeoJSON URL — one per line'></textarea>
-      <button id="loadJsonBtn">Load</button>
-    </details>
-
-    <details>
-      <summary>About / Disclaimer</summary>
-      <p>This is an educational prototype. It visualizes official NHC datasets in an interactive 3D view, with a public-friendly Florida impacts panel. Not an official forecast. For decisions, consult the NHC and your local NWS office.</p>
-    </details>
-  <details open>
-      <summary>Debug Console</summary>
-      <div id="debugOut" class="debug"></div>
-      <button id="copyLogs">Copy logs</button>
+      <summary>Debug</summary>
+      <div id="log" class="debug"></div>
     </details>
   </aside>
-
-<div id="firstRunModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;z-index:9999">
-  <div style="background:#101d36;border:1px solid #2a3b5f;border-radius:12px;padding:16px;max-width:540px;width:90%;color:#e6f1ff">
-    <div style="font-weight:700;font-size:18px;margin-bottom:8px">Quick setup (optional)</div>
-    <div class="small" style="margin-bottom:10px">Add your <strong>Home</strong> (and <strong>Work</strong> if you want) to personalize the Florida Impacts panel and PDFs.</div>
-    <div class="closest">
-      <input id="setupHomeLat" placeholder="Home lat" />
-      <input id="setupHomeLon" placeholder="Home lon" />
-      <button id="setupUseMyLoc">Use my location</button>
-    </div>
-    <div class="closest" style="margin-top:8px">
-      <input id="setupWorkLat" placeholder="Work lat (optional)" />
-      <input id="setupWorkLon" placeholder="Work lon (optional)" />
-    </div>
-    <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
-      <button id="setupSkip" class="modalBtn">Skip for now</button>
-      <button id="setupSave" class="modalBtn">Save</button>
-    </div>
-  </div>
-</div>
-
-
-<div id="preloadModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;z-index:9999">
-  <div style="background:#101d36;border:1px solid #2a3b5f;border-radius:12px;padding:16px;max-width:620px;width:92%;color:#e6f1ff">
-    <div style="font-weight:700;font-size:18px;margin-bottom:8px">Add your places?</div>
-    <div class="small" style="margin-bottom:10px">I can pre-load a few important locations and resolve them to coordinates for you. Uncheck any you don’t want to save.</div>
-    <div id="preloadList" class="card glass small" style="max-height:220px;overflow:auto"></div>
-    <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
-      <button id="preloadSkip" class="modalBtn">Skip</button>
-      <button id="preloadResolve" class="modalBtn">Resolve & preview</button>
-      <button id="preloadSave" class="modalBtn">Save selected</button>
-    </div>
-  </div>
-</div>
-
 </main>
-
-<footer>
-  <div>Data © NOAA/NHC. Code: client-side only. Built for quick exploration.</div>
-</footer>
-
-<script>
-window.onerror = function(msg, src, line, col, err){ const el = document.getElementById("debugOut"); if(el){ el.textContent += "[JS ERROR] "+msg+" @"+src+":"+line+":"+col+"\n"; el.scrollTop = el.scrollHeight; } return false; };
-window.onunhandledrejection = function(e){ const el = document.getElementById("debugOut"); if(el){ el.textContent += "[Promise REJECTION] "+(e.reason && (e.reason.stack||e.reason))+"\n"; el.scrollTop = el.scrollHeight; } };
-</script>
+<footer>Data demo only. Tiles © OpenStreetMap contributors.</footer>
 <script src="app.js"></script>
-<script>
-if("serviceWorker" in navigator){
-  window.addEventListener("load", ()=>{
-    navigator.serviceWorker.register("./sw.js").catch(()=>{});
-  });
-}
-</script>
 </body>
 </html>
