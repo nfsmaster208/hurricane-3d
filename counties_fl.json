@@ -1,0 +1,332 @@
+[
+  {
+    "id": "monroe",
+    "name": "Monroe",
+    "lat": 24.7,
+    "lon": -81.2,
+    "coastal": true
+  },
+  {
+    "id": "miamidade",
+    "name": "Miami-Dade",
+    "lat": 25.65,
+    "lon": -80.49,
+    "coastal": true
+  },
+  {
+    "id": "broward",
+    "name": "Broward",
+    "lat": 26.17,
+    "lon": -80.37,
+    "coastal": true
+  },
+  {
+    "id": "palmbeach",
+    "name": "Palm Beach",
+    "lat": 26.65,
+    "lon": -80.44,
+    "coastal": true
+  },
+  {
+    "id": "martin",
+    "name": "Martin",
+    "lat": 27.08,
+    "lon": -80.41,
+    "coastal": true
+  },
+  {
+    "id": "stlucie",
+    "name": "St. Lucie",
+    "lat": 27.37,
+    "lon": -80.47,
+    "coastal": true
+  },
+  {
+    "id": "indianriver",
+    "name": "Indian River",
+    "lat": 27.69,
+    "lon": -80.56,
+    "coastal": true
+  },
+  {
+    "id": "brevard",
+    "name": "Brevard",
+    "lat": 28.3,
+    "lon": -80.75,
+    "coastal": true
+  },
+  {
+    "id": "volusia",
+    "name": "Volusia",
+    "lat": 29.03,
+    "lon": -81.21,
+    "coastal": true
+  },
+  {
+    "id": "flagler",
+    "name": "Flagler",
+    "lat": 29.46,
+    "lon": -81.31,
+    "coastal": true
+  },
+  {
+    "id": "duval",
+    "name": "Duval",
+    "lat": 30.33,
+    "lon": -81.66,
+    "coastal": true
+  },
+  {
+    "id": "nassau",
+    "name": "Nassau",
+    "lat": 30.6,
+    "lon": -81.74,
+    "coastal": true
+  },
+  {
+    "id": "stjohns",
+    "name": "St. Johns",
+    "lat": 29.9,
+    "lon": -81.42,
+    "coastal": true
+  },
+  {
+    "id": "clay",
+    "name": "Clay",
+    "lat": 29.98,
+    "lon": -81.86,
+    "coastal": false
+  },
+  {
+    "id": "putnam",
+    "name": "Putnam",
+    "lat": 29.6,
+    "lon": -81.74,
+    "coastal": false
+  },
+  {
+    "id": "levy",
+    "name": "Levy",
+    "lat": 29.27,
+    "lon": -82.78,
+    "coastal": true
+  },
+  {
+    "id": "citrus",
+    "name": "Citrus",
+    "lat": 28.88,
+    "lon": -82.52,
+    "coastal": true
+  },
+  {
+    "id": "hernando",
+    "name": "Hernando",
+    "lat": 28.56,
+    "lon": -82.49,
+    "coastal": true
+  },
+  {
+    "id": "pasco",
+    "name": "Pasco",
+    "lat": 28.32,
+    "lon": -82.43,
+    "coastal": true
+  },
+  {
+    "id": "pinellas",
+    "name": "Pinellas",
+    "lat": 27.91,
+    "lon": -82.74,
+    "coastal": true
+  },
+  {
+    "id": "hillsborough",
+    "name": "Hillsborough",
+    "lat": 27.97,
+    "lon": -82.34,
+    "coastal": true
+  },
+  {
+    "id": "manatee",
+    "name": "Manatee",
+    "lat": 27.48,
+    "lon": -82.36,
+    "coastal": true
+  },
+  {
+    "id": "sarasota",
+    "name": "Sarasota",
+    "lat": 27.19,
+    "lon": -82.43,
+    "coastal": true
+  },
+  {
+    "id": "charlotte",
+    "name": "Charlotte",
+    "lat": 26.86,
+    "lon": -81.9,
+    "coastal": true
+  },
+  {
+    "id": "lee",
+    "name": "Lee",
+    "lat": 26.55,
+    "lon": -81.87,
+    "coastal": true
+  },
+  {
+    "id": "collier",
+    "name": "Collier",
+    "lat": 26.07,
+    "lon": -81.43,
+    "coastal": true
+  },
+  {
+    "id": "bay",
+    "name": "Bay",
+    "lat": 30.25,
+    "lon": -85.63,
+    "coastal": true
+  },
+  {
+    "id": "gulf",
+    "name": "Gulf",
+    "lat": 29.91,
+    "lon": -85.24,
+    "coastal": true
+  },
+  {
+    "id": "franklin",
+    "name": "Franklin",
+    "lat": 29.84,
+    "lon": -84.88,
+    "coastal": true
+  },
+  {
+    "id": "wakulla",
+    "name": "Wakulla",
+    "lat": 30.16,
+    "lon": -84.39,
+    "coastal": true
+  },
+  {
+    "id": "jefferson",
+    "name": "Jefferson",
+    "lat": 30.42,
+    "lon": -83.91,
+    "coastal": false
+  },
+  {
+    "id": "taylor",
+    "name": "Taylor",
+    "lat": 30.08,
+    "lon": -83.62,
+    "coastal": true
+  },
+  {
+    "id": "dixie",
+    "name": "Dixie",
+    "name_long": "Dixie",
+    "lat": 29.58,
+    "lon": -83.17,
+    "coastal": true
+  },
+  {
+    "id": "escambia",
+    "name": "Escambia",
+    "lat": 30.61,
+    "lon": -87.34,
+    "coastal": true
+  },
+  {
+    "id": "santarosa",
+    "name": "Santa Rosa",
+    "lat": 30.7,
+    "lon": -86.98,
+    "coastal": true
+  },
+  {
+    "id": "okaloosa",
+    "name": "Okaloosa",
+    "lat": 30.63,
+    "lon": -86.59,
+    "coastal": true
+  },
+  {
+    "id": "walton",
+    "name": "Walton",
+    "lat": 30.67,
+    "lon": -86.17,
+    "coastal": true
+  },
+  {
+    "id": "leon",
+    "name": "Leon",
+    "lat": 30.45,
+    "lon": -84.28,
+    "coastal": false
+  },
+  {
+    "id": "orange",
+    "name": "Orange",
+    "lat": 28.53,
+    "lon": -81.39,
+    "coastal": false
+  },
+  {
+    "id": "seminole",
+    "name": "Seminole",
+    "lat": 28.69,
+    "lon": -81.24,
+    "coastal": false
+  },
+  {
+    "id": "osceola",
+    "name": "Osceola",
+    "lat": 28.06,
+    "lon": -81.17,
+    "coastal": false
+  },
+  {
+    "id": "polk",
+    "name": "Polk",
+    "lat": 27.95,
+    "lon": -81.7,
+    "coastal": false
+  },
+  {
+    "id": "alachua",
+    "name": "Alachua",
+    "lat": 29.65,
+    "lon": -82.35,
+    "coastal": false
+  },
+  {
+    "id": "marion",
+    "name": "Marion",
+    "lat": 29.21,
+    "lon": -82.06,
+    "coastal": false
+  },
+  {
+    "id": "sumter",
+    "name": "Sumter",
+    "lat": 28.7,
+    "lon": -82.08,
+    "coastal": false
+  },
+  {
+    "id": "lake",
+    "name": "Lake",
+    "lat": 28.76,
+    "lon": -81.76,
+    "coastal": false
+  },
+  {
+    "id": "volusia_inland",
+    "name": "Volusia (inland)",
+    "lat": 29.07,
+    "lon": -81.33,
+    "coastal": false
+  }
+]

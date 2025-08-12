@@ -1,0 +1,107 @@
+[
+  {
+    "id": "orl",
+    "label": "Orlando",
+    "county": "Orange",
+    "lat": 28.5383,
+    "lon": -81.3792
+  },
+  {
+    "id": "mia",
+    "label": "Miami",
+    "county": "Miami-Dade",
+    "lat": 25.7617,
+    "lon": -80.1918
+  },
+  {
+    "id": "tpa",
+    "label": "Tampa",
+    "county": "Hillsborough",
+    "lat": 27.9506,
+    "lon": -82.4572
+  },
+  {
+    "id": "jax",
+    "label": "Jacksonville",
+    "county": "Duval",
+    "lat": 30.3322,
+    "lon": -81.6557
+  },
+  {
+    "id": "wpb",
+    "label": "West Palm Beach",
+    "county": "Palm Beach",
+    "lat": 26.7153,
+    "lon": -80.0534
+  },
+  {
+    "id": "fll",
+    "label": "Fort Lauderdale",
+    "county": "Broward",
+    "lat": 26.1224,
+    "lon": -80.1373
+  },
+  {
+    "id": "rdu",
+    "label": "Daytona Beach",
+    "county": "Volusia",
+    "lat": 29.2108,
+    "lon": -81.0228
+  },
+  {
+    "id": "stp",
+    "label": "St. Petersburg",
+    "county": "Pinellas",
+    "lat": 27.7676,
+    "lon": -82.6403
+  },
+  {
+    "id": "srb",
+    "label": "Sarasota",
+    "county": "Sarasota",
+    "lat": 27.3364,
+    "lon": -82.5307
+  },
+  {
+    "id": "fmy",
+    "label": "Fort Myers",
+    "county": "Lee",
+    "lat": 26.6406,
+    "lon": -81.8723
+  },
+  {
+    "id": "nap",
+    "label": "Naples",
+    "county": "Collier",
+    "lat": 26.142,
+    "lon": -81.7948
+  },
+  {
+    "id": "key",
+    "label": "Key West",
+    "county": "Monroe",
+    "lat": 24.5551,
+    "lon": -81.78
+  },
+  {
+    "id": "pen",
+    "label": "Pensacola",
+    "county": "Escambia",
+    "lat": 30.4213,
+    "lon": -87.2169
+  },
+  {
+    "id": "tlh",
+    "label": "Tallahassee",
+    "county": "Leon",
+    "lat": 30.4383,
+    "lon": -84.2807
+  },
+  {
+    "id": "mel",
+    "label": "Melbourne",
+    "county": "Brevard",
+    "lat": 28.0836,
+    "lon": -80.6081
+  }
+]
