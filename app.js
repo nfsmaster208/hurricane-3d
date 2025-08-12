@@ -6,9 +6,9 @@
 // This app tries live sources and falls back to demo_storm.json
 
 const state = {
-  view: 'globe',  // 'globe' | 'map'
+  view: 'map',  // 'globe' | 'map'
   storms: [],
-  _offline: false,
+  _offline: true,
   activeStormId: null,
   timeline: [], // times available
   activeIndex: 0,
@@ -96,6 +96,7 @@ const timeSlider = document.getElementById('timeSlider');
 const timeLabel = document.getElementById('timeLabel');
 const viewToggle = document.getElementById('viewToggle');
 const citySelect = document.getElementById('citySelect');
+if(viewToggle){ viewToggle.checked = (state.view==='map'); }
 const closestReadout = document.getElementById('closestReadout');
 
 // Initial UI wiring
@@ -691,6 +692,7 @@ async function geocode(query){
 
 // --- Map (tilted 3D) ---
 function initMap(){
+  if(typeof maplibregl==='undefined'){ log('MapLibre not loaded'); const msg=document.createElement('div'); msg.style.color='#d3e4ff'; msg.style.padding='12px'; msg.textContent='Map engine failed to load. Check connection or try again.'; stageMap.appendChild(msg); return; }
   const map = new maplibregl.Map({
     container: 'mapContainer',
     style: RASTER_STYLE,

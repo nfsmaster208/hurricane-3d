@@ -17,8 +17,6 @@
   <script src="https://unpkg.com/three-globe@2.30.0/dist/three-globe.min.js"></script>
   <!-- Turf for geodesic math -->
   <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
-  <!-- lil-gui controls -->
-  <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.18/+esm" type="module"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
@@ -39,7 +37,7 @@
     <span id="timeLabel">—</span>
     <button id="shareBtn">Share</button>
     <button id="recordBtn">Record</button>
-    <label class="toggle"><input type="checkbox" id="offlineChk" /> <span>Offline (demo)</span></label>
+    <label class="toggle"><input type="checkbox" id="offlineChk" checked /> <span>Offline (demo)</span></label>
     <button id="diagBtn">Run diagnostics</button>
   </div>
 </header>
@@ -213,6 +211,10 @@
   <div>Data © NOAA/NHC. Code: client-side only. Built for quick exploration.</div>
 </footer>
 
+<script>
+window.onerror = function(msg, src, line, col, err){ const el = document.getElementById("debugOut"); if(el){ el.textContent += "[JS ERROR] "+msg+" @"+src+":"+line+":"+col+"\n"; el.scrollTop = el.scrollHeight; } return false; };
+window.onunhandledrejection = function(e){ const el = document.getElementById("debugOut"); if(el){ el.textContent += "[Promise REJECTION] "+(e.reason && (e.reason.stack||e.reason))+"\n"; el.scrollTop = el.scrollHeight; } };
+</script>
 <script src="app.js"></script>
 <script>
 if("serviceWorker" in navigator){
