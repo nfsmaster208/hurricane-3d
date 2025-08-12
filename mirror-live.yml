@@ -1,0 +1,28 @@
+name: Mirror live GeoJSON
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch live GeoJSON
+        run: |
+          mkdir -p live
+          ROOT="https://mapservices.weather.noaa.gov/tropical/rest/services/tropical/NHC_tropical_weather_summary/MapServer"
+          curl -L "$ROOT/7/query?where=1%3D1&returnGeometry=true&outFields=*&f=geojson"  -o live/cone.geojson
+          curl -L "$ROOT/6/query?where=1%3D1&returnGeometry=true&outFields=*&f=geojson"  -o live/track.geojson
+          curl -L "$ROOT/15/query?where=1%3D1&returnGeometry=true&outFields=*&f=geojson" -o live/wind.geojson
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add live/*.geojson || true
+          git commit -m "Update live GeoJSON" || echo "No changes"
+          git push
