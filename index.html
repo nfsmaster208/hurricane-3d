@@ -1,19 +1,19 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Hurricane Explorer — Mobile Fallback (v5)</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Hurricane Explorer — Minimal (v5.1)</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 <header>
-  <div class="brand">🌀 Hurricane Explorer (v5)</div>
-  <div class="controls">
-    <button id="liveToggle">Live OFF</button>
-    <button id="centerFlorida">Florida</button>
+  <div class="brand">🌀 Hurricane Explorer (v5.1)</div>
+  <div class="actions">
+    <button id="reload">Reload demo</button>
+    <button id="togglePanel">Hide panel</button>
   </div>
 </header>
 <main>
@@ -26,6 +26,7 @@
       <label><input type="checkbox" id="wind34Chk" checked/> 34 kt wind area</label>
       <label><input type="checkbox" id="wind50Chk"/> 50 kt wind area</label>
       <label><input type="checkbox" id="wind64Chk"/> 64 kt wind area</label>
+      <div class="slider"><input id="time" type="range" min="0" max="0" value="0"/><span id="tlabel">—</span></div>
     </details>
 
     <details open>
@@ -37,16 +38,16 @@
         <div><span class="pill watch"></span> 48–72h Monitor</div>
         <div><span class="pill calm"></span> &gt;72h Low</div>
       </div>
-      <div class="note">Offline demo data. For decisions, use official NHC/NWS sources.</div>
+      <div class="note small">Offline demo data. For decisions, consult NHC/NWS.</div>
     </details>
 
-    <details open>
+    <details>
       <summary>Debug</summary>
-      <div id="log" class="debug"></div>
+      <pre id="log" class="debug"></pre>
     </details>
   </aside>
 </main>
-<footer>Data demo only. Tiles © OpenStreetMap contributors.</footer>
+<footer>Tiles © OpenStreetMap contributors. Demo layers are synthetic.</footer>
 <script src="app.js"></script>
 </body>
 </html>
