@@ -1,6 +1,1 @@
-<html>
-<head><title>403 Forbidden</title></head>
-<body>
-<center><h1>403 Forbidden</h1></center>
-</body>
-</html>
+{"type":"FeatureCollection","features":[{"type":"Feature","id":47833,"geometry":{"type":"LineString","coordinates":[[-113.09999999959973,17.100000000100806],[-114.69999999999942,17.900000000300622],[-116.49999999999943,18.800000000300656],[-118.20000000019928,20.100000000400541],[-119.60000000009933,21.600000000100806],[-120.69999999969963,23.000000000000853],[-121.40000000009934,24.200000000300633],[-121.4999999998995,26.000000000300645],[-122.30000000009937,26.199999999900967]]},"properties":{"objectid":47833,"stormname":"Juliette","stormtype":"TS","basin":"EP","advdate":"800 AM MST Mon Aug 25 2025","advisnum":"4","fcstprd":120,"stormnum":10,"idp_source":"EP5_ep102025-004_5day_lin","idp_filedate":1756135882000,"idp_ingestdate":1756136024000,"st_length(shape)":13.790328014397909}},{"type":"Feature","id":47832,"geometry":{"type":"LineString","coordinates":[[-57.800000000398995,34.200000000100829],[-56.699999999899376,36.00000000010084],[-54.599999999599618,38.499999999601187],[-51.500000000398984,41.499999999900979],[-48.000000000199122,44.000000000300702]]},"properties":{"objectid":47832,"stormname":"Fernand","stormtype":"TS","basin":"AL","advdate":"1100 AM AST Mon Aug 25 2025","advisnum":"8","fcstprd":120,"stormnum":6,"idp_source":"AT1_al062025-008_5day_lin","idp_filedate":1756135830000,"idp_ingestdate":1756135903000,"st_length(shape)":13.989561410081485}}]}
