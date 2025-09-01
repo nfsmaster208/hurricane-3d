@@ -1,6 +1,1 @@
-<html>
-<head><title>403 Forbidden</title></head>
-<body>
-<center><h1>403 Forbidden</h1></center>
-</body>
-</html>
+{"type":"FeatureCollection","features":[{"type":"Feature","id":47891,"geometry":{"type":"LineString","coordinates":[[-124.59999999999945,14.499999999900922],[-125.80000000029924,14.400000000100761],[-127.3999999997996,14.300000000300599],[-129.00000000019929,14.199999999601175],[-130.59999999969966,14.099999999801014],[-132.39999999969967,14.099999999801014],[-134.19999999969968,14.099999999801014],[-138.09999999999945,14.099999999801014],[-141.79999999979964,14.499999999900922]]},"properties":{"objectid":47891,"stormname":"Kiko","stormtype":"TS","basin":"EP","advdate":"500 PM HST Sun Aug 31 2025","advisnum":"4","fcstprd":120,"stormnum":11,"idp_source":"EP1_ep112025-004_5day_lin","idp_filedate":1756697427000,"idp_ingestdate":1756697530000,"st_length(shape)":17.235084133443642}}]}
