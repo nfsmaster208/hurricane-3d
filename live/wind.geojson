@@ -1,1 +1,1 @@
-{"type":"FeatureCollection","features":[{"type":"Feature","id":147593,"geometry":{"type":"Polygon","coordinates":[]},"properties":{"objectid":147593,"radii":34,"stormid":"ep132025","basin":"ep","stormnum":13,"advnum":"7","validtime":"2025091306","synoptime":"2025091300","timezone":"UTC","tau":0,"ne":0,"se":0,"sw":0,"nw":0,"idp_source":"EP3_ep132025_2025091306_forecastradii","idp_filedate":1757764827000,"idp_ingestdate":1757764897000,"st_area(shape)":0,"st_perimeter(shape)":0}}]}
+{"type":"FeatureCollection","features":[]}
