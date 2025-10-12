@@ -1,1 +1,1 @@
-{"type":"FeatureCollection","features":[{"type":"Feature","id":159134,"geometry":{"type":"Polygon","coordinates":[]},"properties":{"objectid":159134,"radii":34,"stormid":"ep172025","basin":"ep","stormnum":17,"advnum":"11","validtime":"2025101203","synoptime":"2025101200","timezone":"UTC","tau":0,"ne":0,"se":0,"sw":0,"nw":0,"idp_source":"EP2_ep172025_2025101203_forecastradii","idp_filedate":1760245228000,"idp_ingestdate":1760245395000,"st_area(shape)":0,"st_perimeter(shape)":0}}]}
+{"type":"FeatureCollection","features":[]}
