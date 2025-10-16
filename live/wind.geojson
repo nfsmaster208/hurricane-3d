@@ -1,1 +1,1 @@
-{"type":"FeatureCollection","features":[{"type":"Feature","id":159322,"geometry":{"type":"Polygon","coordinates":[]},"properties":{"objectid":159322,"radii":34,"stormid":"al122025","basin":"al","stormnum":12,"advnum":"11","validtime":"2025101521","synoptime":"2025101518","timezone":"UTC","tau":0,"ne":0,"se":0,"sw":0,"nw":0,"idp_source":"AT2_al122025_2025101521_forecastradii","idp_filedate":1760572831000,"idp_ingestdate":1760572879000,"st_area(shape)":0,"st_perimeter(shape)":0}}]}
+{"type":"FeatureCollection","features":[]}
